@@ -62,3 +62,19 @@ Some extensions have been implented [here](https://github.com/kevaday/alphazero-
 * [Plamen Totev](https://github.com/plamentotev) contributed Go Text Protocol player for Othello.
 
 Note: Chainer and TensorFlow v1 versions have been removed but can be found prior to commit [2ad461c](https://github.com/suragnair/alpha-zero-general/tree/2ad461c393ecf446e76f6694b613e394b8eb652f).
+
+### 学习随笔
+[tutorial](https://suragnair.github.io/posts/alphazero.html)
+- 神经网络与损失函数设计
+神经网络被训练以最小化以下损失函数
+$$
+l = \sum_{t} (v_{\theta}(s_t) - z_t)^2 - \vec{\pi}_t \cdot \log(\vec{p}_{\theta}(s_t))
+$$
+$v_{\theta}$ 和 $\vec{p}_{\theta}$ 都是关于$\theta$的神经网络
+
+- 探索与利用（exploration and exploitation）
+$$
+U(s,a)=Q(s,a)+c_{puct}\cdot P(s,a)\cdot\frac{\sqrt{\sum_{b}N(s,b)}}{1 + N(s,a)}
+$$
+
+
