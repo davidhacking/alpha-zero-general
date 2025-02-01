@@ -76,5 +76,18 @@ $v_{\theta}$ 和 $\vec{p}_{\theta}$ 都是关于$\theta$的神经网络
 $$
 U(s,a)=Q(s,a)+c_{puct}\cdot P(s,a)\cdot\frac{\sqrt{\sum_{b}N(s,b)}}{1 + N(s,a)}
 $$
+  - Q[s][a]（s状态下采取a行动的Q值） 是通过 Q[s][a] = (N[s][a]*Q[s][a] + v)/(N[s][a]+1) 每次更新得到
+  - P[s][a] 通过模型预测得到 P[s], v = nnet.predict(s)
+  - N[s][a] 则是统计值
+  - $\sum_{b}N(s,b)$ = sum(N[s])
+- 开发环境
+  - 基础镜像：pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+  - pip install coloredlogs==15.0.1
+- 通过getSymmetries函数得到更多的训练数据
+- 模型训练的输入是什么
+  ```python
+  boards = torch.FloatTensor(np.array(boards).astype(np.float64))
+  ```
+
 
 
