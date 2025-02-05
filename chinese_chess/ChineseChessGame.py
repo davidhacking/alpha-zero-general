@@ -144,7 +144,7 @@ class ChineseChessBoard():
     }
     stright_action_func = lambda name, action_delta, x, y:  (action_delta, y) if action_delta <= 8 else (x, action_delta - 9)
     action_func = lambda name, action_delta, x, y: (x + ChineseChessBoard.mov_dir[name[0]][action_delta][0], y + ChineseChessBoard.mov_dir[name[0]][action_delta][1])
-    r_stright_action_func = lambda name, x1, y1, x2, y2: x2 if y1 == y2 else y2
+    r_stright_action_func = lambda name, x1, y1, x2, y2: x2 if y1 == y2 else (y2 + 9)
     r_action_func = lambda name, x1, y1, x2, y2: ChineseChessBoard.mov_dir[name[0]].index((x2 - x1, y2 - y1))
     
     action_dict = {
