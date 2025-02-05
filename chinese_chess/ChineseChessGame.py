@@ -139,8 +139,8 @@ class ChineseChessBoard():
         'B': [(-2, -2), (2, -2), (2, 2), (-2, 2)],
         'n': [(-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1)],
         'N': [(-1, -2), (1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1)],
-        'p': [(0, -1), (-1, 0), (1, 0)],
-        'P': [(0, 1), (-1, 0), (1, 0)]
+        'p': [(0, -1), (0, 1), (-1, 0), (1, 0)],
+        'P': [(0, -1), (0, 1), (-1, 0), (1, 0)]
     }
     stright_action_func = lambda name, action_delta, x, y:  (action_delta, y) if action_delta <= 8 else (x, action_delta - 9)
     action_func = lambda name, action_delta, x, y: (x + ChineseChessBoard.mov_dir[name[0]][action_delta][0], y + ChineseChessBoard.mov_dir[name[0]][action_delta][1])
@@ -225,7 +225,7 @@ class ChineseChessBoard():
             u = u + 1
         return d, u
 
-    def _init_legal_moves(self, color):
+    def _init_legal_moves(self, color): # 先判断老将的位置，如果没有老将直接返回空，按老将的位置判定小兵活动范围
         _legal_moves = []
         for y in range(self.height):
             for x in range(self.width):
@@ -303,14 +303,15 @@ class ChineseChessBoard():
         return _legal_moves
 
     def isValidAction(self, action, color):
+        print(f"_red_legal_actions={self._red_legal_actions}")
+        print(f"_black_legal_actions={self._black_legal_actions}")
         return action in self._red_legal_actions if color == ChineseChessBoard.RED else action in self._black_legal_actions
         
     def takeAction(self, action, color):
-        if not self.isValidAction(action, color):
-            return False
+        print(f"takeAction action={action} color={color}")
+        assert self.isValidAction(action, color)
         name = ChineseChessBoard.action_num_to_name[action]
-        if name not in self.name2point:
-            return False
+        assert name in self.name2point
         x1, y1 = self.name2point[name]
         action_item = ChineseChessBoard.action_dict[name]
         x2, y2 = action_item[2](name, action-action_item[0], x1, y1)
@@ -358,11 +359,18 @@ class ChineseChessGame():
             nextBoard: board after applying action
             nextPlayer: player who plays in the next turn (should be -player)
         """
-        board = ChineseChessBoard(board)
-        board.takeAction(action, player)
-        next_board = board.board
-        # Switch player
+        print(f"getNextState player={player} action={action}")
         next_player = -player
+        if player == ChineseChessBoard.RED:
+            board = ChineseChessBoard(board)
+            board.takeAction(action+1, player)
+            next_board = board.board
+            return next_board, next_player
+        # 需要调整回getCanonicalForm的棋盘，将action转为p2p，再计算出新的action
+        canonicalFormBoard = self.getCanonicalForm(board, player)
+        canonicalFormBoard = ChineseChessBoard(canonicalFormBoard)
+        canonicalFormBoard.takeAction(action+1, -player)
+        next_board = self.getCanonicalForm(canonicalFormBoard.board, player)
         return next_board, next_player
 
     def getValidMoves(self, board, player):
@@ -378,7 +386,7 @@ class ChineseChessGame():
         """
         valid_moves = [0] * self.getActionSize()
         board = ChineseChessBoard(board)
-        actions = board.get_legal_actions()
+        actions = board.get_legal_actions(player)
         for a in actions:
             valid_moves[a-1] = 1
         return valid_moves
@@ -466,6 +474,11 @@ class ChineseChessGame():
     def display(board):
         board = ChineseChessBoard(board)
         board.print_board()
+    
+    @staticmethod
+    def move_to_action(board, x1, y1, x2, y2):
+        board = ChineseChessBoard(board)
+        return board.move_to_action(x1, y1, x2, y2)-1
     
 if __name__ == "__main__":
     game = ChineseChessGame()
