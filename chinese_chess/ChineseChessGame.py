@@ -226,6 +226,15 @@ class ChineseChessBoard():
         return d, u
 
     def _init_legal_moves(self, color): # 先判断老将的位置，如果没有老将直接返回空，按老将的位置判定小兵活动范围
+        if 'k' not in self.name2point:
+            return []
+        if 'K' not in self.name2point:
+            return []
+        kx, ky = self.name2point['k']
+        Kx, Ky = self.name2point['K']
+        board_flag = True # 红棋位于棋盘下方
+        if ky >= 0 and ky <= 2:
+            board_flag = False # 红棋位于棋盘上方方
         _legal_moves = []
         for y in range(self.height):
             for x in range(self.width):
@@ -240,24 +249,54 @@ class ChineseChessBoard():
                         y_ = y + d[1]
                         if not self._can_move(x_, y_, color):
                             continue
-                        elif ch == 'p' and y < 5 and x_ != x:  # for red pawn
-                            continue
-                        elif ch == 'P' and y > 4 and x_ != x:  # for black pawn
-                            continue
+                        elif ch == 'p':  # for red pawn
+                            if board_flag:
+                                if y < 5 and x_ != x:
+                                    continue
+                            else:
+                                if y > 4 and x_ != x:
+                                    continue
+                        elif ch == 'P':  # for black pawn
+                            if board_flag:
+                                if y > 4 and x_ != x:
+                                    continue
+                            else:
+                                if y < 5 and x_ != x:
+                                    continue
                         elif ch == 'n' or ch == 'N' or ch == 'b' or ch == 'B': # for knight and bishop
                             if self[y+int(d[1]/2), x+int(d[0]/2)] != '.':
                                 continue
-                            elif ch == 'b' and y_ > 4:
-                                continue
-                            elif ch == 'B' and y_ < 5:
-                                continue
+                            elif ch == 'b':
+                                if board_flag:
+                                    if y < 5:
+                                        continue
+                                else:
+                                    if y > 4:
+                                        continue
+                            elif ch == 'B':
+                                if board_flag:
+                                    if y > 4:
+                                        continue
+                                else:
+                                    if y < 5:
+                                        continue
                         elif ch != 'p' and ch != 'P': # for king and advisor
                             if x_ < 3 or x_ > 5:
                                 continue
-                            if (ch == 'k' or ch == 'a') and y_ > 2:
-                                continue
-                            if (ch == 'K' or ch == 'A') and y_ < 7:
-                                continue
+                            if (ch == 'k' or ch == 'a'):
+                                if board_flag:
+                                    if y_ < 7:
+                                        continue
+                                else:
+                                    if y_ > 2:
+                                        continue
+                            if (ch == 'K' or ch == 'A'):
+                                if board_flag:
+                                    if y_ > 2:
+                                        continue
+                                else:
+                                    if y_ < 7:
+                                        continue
                         _legal_moves.append((x, y, x_, y_))
                         if (ch == 'k' and color == ChineseChessBoard.RED): #for King to King check
                             d, u = self._y_board_from(x, y)
